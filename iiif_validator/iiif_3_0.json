@@ -1,0 +1,287 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "$comment": "IIIF basic types",
+    "types": {
+        "id": {
+            "type": "string", 
+            "format": "uri",
+            "pattern": "^http.*$",
+            "title": "Id must be presesnt and must be a URI"
+        },
+        "lngString": {
+            "$id": "#lngString",
+            "title": "Language string, must have a languagae and value must be an array.",
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z-][a-zA-Z-]*$": { 
+                    "type": "array",
+                    "items": { "type": "string"}
+                },
+                "^none$": { 
+                    "type": "array",
+                    "items": { "type": "string"}
+                }
+            },
+            "additionalProperties": false
+        },
+        "keyValueString": {
+            "$id": "#keyValueString",
+            "type": "object",
+            "properties": {
+                "label": {"$ref": "#/types/lngString" },
+                "value": {"$ref": "#/types/lngString" }
+            },
+            "required": ["label", "value"]
+        },
+        "BCP47": {
+            "anyOf": [
+                {
+                    "type":"string",
+                    "pattern": "^[a-zA-Z-][a-zA-Z-]*$"
+                },
+                {
+                    "type":"string",
+                    "pattern": "^none$"
+                }
+            ]     
+        },
+        "format": {
+            "type": "string",
+            "pattern": "^[a-z][a-z]*/.*$"
+        },
+        "class": {
+            "type": "object", 
+            "properties": {
+                "id": { "$ref": "#/types/id" },
+                "type": { "type": "string" },
+                "label": { "$ref": "#/types/lngString" } 
+            },
+            "required": ["id", "type"]
+        }
+    },        
+
+    "$comment": "IIIF Classes",
+    "classes": {
+        "metadata": { 
+            "type": "object",
+            "patternProperties": {
+                "^.*$": { 
+                    "$ref": "#/types/keyValueString"
+                }
+            }    
+        },
+        "homepage": {
+            "type": "array",
+            "items": {
+                "allOf": [
+                    { "$ref": "#/types/class" },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "format": { "$ref": "#/types/format" },
+                            "language": { 
+                                "type": "array",
+                                "items": { "$ref": "#/types/BCP47" }
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "seeAlso": {
+            "type": "array",
+            "items": {
+                "allOf": [
+                    { "$ref": "#/types/class" },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "format": { "$ref": "#/types/format" },
+                            "profile": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "imgResource": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "#/types/id" },
+                "type": {
+                    "type": "string",
+                    "pattern": "^Image$"
+                },
+                "format": { "$ref": "#/types/format" },
+                "height": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
+                },
+                "service": { "$ref": "#/classes/imgSvr" }
+            }
+        },
+        "imgSvr": {
+            "type": "array",
+            "items": {
+                "allOf": [
+                    { "$ref": "#/types/class" },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "profile": { "type": "string" },
+                            "@id": { "$ref": "#/types/id" },
+                            "@type": { "type": "string" }
+                        }
+                    }
+                ]
+            }    
+        }, 
+        "viewingDirection": {
+            "anyOf": [
+                { 
+                    "type": "string",
+                    "pattern": "^left-to-right$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^right-to-left$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^top-to-bottom$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^bottom-to-top$"
+                }
+            ]
+        },
+        "behavior": {
+            "anyOf": [
+                { 
+                    "type": "string",
+                    "pattern": "^auto-advance$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^no-auto-advance$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^repeat$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^no-repeat$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^unordered$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^individuals$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^continuous$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^paged$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^facing-pages$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^non-paged$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^multi-part$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^together$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^sequence$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^thumbnail-nav$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^no-nav$"
+                },
+                { 
+                    "type": "string",
+                    "pattern": "^hidden$"
+                }
+            ]
+        }
+    },
+    "$id": "http://iiif.io/api/presentation/3/schema.json" ,
+    "allOf": [
+        { "$ref": "#/types/class" },
+        {
+            "type": "object",
+            "properties": {
+                "@context": {
+                    "type": "array"
+                },
+                "metadata": { "$ref": "#/classes/metadata" },
+                "summary": { "$ref": "#/types/lngString" },
+                "requiredStatement": { "$ref": "#/types/keyValueString" },
+                "rights": {
+                    "type": "string", 
+                    "format": "uri",
+                    "pattern": "^http.*$"
+                },
+                "navDate": {
+                    "type": "string", 
+                    "format": "date-time"
+                },
+                "provider": {
+                    "type": "array",
+                    "items": {
+                        "allOf": [
+                            { "$ref": "#/types/class" },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "pattern": "^Agent$"
+                                    },
+                                    "homepage": { "$ref": "#/classes/homepage" },
+                                    "logo": {
+                                        "type": "array",
+                                        "items": { "$ref": "#/classes/imgResource" }
+                                    },    
+                                    "seeAlso": { "$ref": "#/classes/seeAlso" }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "seeAlso": { "$ref": "#/classes/seeAlso" },
+                "thumbnail": {
+                    "type": "array",
+                    "items": { "$ref": "#/classes/imgResource" }
+                },
+                "homepage": { "$ref": "#/classes/homepage" },
+                "viewingDirection": { "$ref": "#/classes/viewingDirection" },
+                "behavior": { "$ref": "#/classes/behavior" }
+            },
+            "required": [ "label" ]
+        }
+    ]             
+}
